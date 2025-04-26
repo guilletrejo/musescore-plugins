@@ -55,26 +55,37 @@ MuseScore {
             while (cursor.segment) {
                   var segment = cursor.segment;
 
+                  // FIRST: check annotations (e.g., StaffText)
+                  if (segment.annotations) {
+                        for (var i = 0; i < segment.annotations.length; i++) {
+                              var annotation = segment.annotations[i];
+                              console.log("Annotation type:", annotation.type, "Text:", annotation.text);
+                              if (annotation && annotation.type === Element.STAFF_TEXT) {
+                                    if (markingsToRemove.indexOf(annotation.text) !== -1) {
+                                          // annotation.remove()
+                                          // curScore.removeElement(annotation);
+                                          console.log("This annotation will be removed now...");
+                                    }
+                              }
+                        }
+                  }
+
+                  // SECOND: check notes (chords)
                   for (var track = 0; track < curScore.ntracks; track++) {
                         var element = segment.elementAt(track);
-
                         if (!element)
-                        continue;
-
-                        if (element.type === Element.STAFF_TEXT && markingsToRemove.indexOf(element.text) !== -1) {
-                        curScore.removeElement(element);
-                        }
+                              continue;
 
                         if (element.type === Element.CHORD) {
-                        for (var i = 0; i < element.notes.length; i++) {
+                              for (var i = 0; i < element.notes.length; i++) {
                               var note = element.notes[i];
                               resetColor(note);
-                        }
+                              }
                         }
                   }
 
                   cursor.next();
-            }
+                  }
       }
 
       // Utility function to return the sign of a number
