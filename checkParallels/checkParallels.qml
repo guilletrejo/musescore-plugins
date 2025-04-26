@@ -16,6 +16,7 @@ MuseScore {
 
       property bool processAll: false
       property bool errorChords: false
+      property bool cleanupBeforeRun: true
 
       id: checkParallels
 
@@ -37,6 +38,42 @@ MuseScore {
             }
 
             visible: false
+      }
+
+      // Set color to black
+      function resetColor(note) {
+            note.color = "#000000"
+      }
+
+      // Cleanup function: remove previous text and reset colors
+      function cleanupOldMarkings() {
+            var cursor = curScore.newCursor()
+            cursor.rewind(0)
+
+            while (cursor.segment) {
+                  var segment = cursor.segment
+
+                  for (var track = 0; track < curScore.ntracks; track++) {
+                        var element = segment.elementAt(track)
+
+                        if (element) {
+                        if (element.type === Element.STAFF_TEXT &&
+                              (element.text === "parallel 5th" || element.text === "hidden 5th" ||
+                              element.text === "parallel 8th" || element.text === "hidden 8th")) {
+                              curScore.removeElement(element)
+                        }
+
+                        if (element.type === Element.CHORD) {
+                              for (var i = 0; i < element.notes.length; i++) {
+                                    var note = element.notes[i]
+                                    resetColor(note)
+                              }
+                        }
+                        }
+                  }
+
+                  cursor.next()
+            }
       }
 
       // Utility function to return the sign of a number
@@ -73,8 +110,12 @@ MuseScore {
                   console.error("No score found")
                   quit()
             }
-
             curScore.startCmd()
+
+            if (cleanupBeforeRun) {
+                  console.log("Cleaning up old markings...")
+                  cleanupOldMarkings()
+            }
 
             // Define the start and end of the area to be checked
             var startStaff, endStaff, endTick
