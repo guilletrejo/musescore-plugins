@@ -47,32 +47,33 @@ MuseScore {
 
       // Cleanup function: remove previous text and reset colors
       function cleanupOldMarkings() {
-            var cursor = curScore.newCursor()
-            cursor.rewind(0)
+            var markingsToRemove = ["parallel 5th", "hidden 5th", "parallel 8th", "hidden 8th"];
+
+            var cursor = curScore.newCursor();
+            cursor.rewind(0);
 
             while (cursor.segment) {
-                  var segment = cursor.segment
+                  var segment = cursor.segment;
 
                   for (var track = 0; track < curScore.ntracks; track++) {
-                        var element = segment.elementAt(track)
+                        var element = segment.elementAt(track);
 
-                        if (element) {
-                        if (element.type === Element.STAFF_TEXT &&
-                              (element.text === "parallel 5th" || element.text === "hidden 5th" ||
-                              element.text === "parallel 8th" || element.text === "hidden 8th")) {
-                              curScore.removeElement(element)
+                        if (!element)
+                        continue;
+
+                        if (element.type === Element.STAFF_TEXT && markingsToRemove.indexOf(element.text) !== -1) {
+                        curScore.removeElement(element);
                         }
 
                         if (element.type === Element.CHORD) {
-                              for (var i = 0; i < element.notes.length; i++) {
-                                    var note = element.notes[i]
-                                    resetColor(note)
-                              }
+                        for (var i = 0; i < element.notes.length; i++) {
+                              var note = element.notes[i];
+                              resetColor(note);
                         }
                         }
                   }
 
-                  cursor.next()
+                  cursor.next();
             }
       }
 
