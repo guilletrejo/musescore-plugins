@@ -62,9 +62,8 @@ MuseScore {
                               console.log("Annotation type:", annotation.type, "Text:", annotation.text);
                               if (annotation && annotation.type === Element.STAFF_TEXT) {
                                     if (markingsToRemove.indexOf(annotation.text) !== -1) {
-                                          // annotation.remove()
-                                          // curScore.removeElement(annotation);
                                           console.log("This annotation will be removed now...");
+                                          removeElement(annotation);
                                     }
                               }
                         }
