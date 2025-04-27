@@ -7,7 +7,7 @@ import MuseScore 3.0
 import Muse.UiComponents 1.0
 
 MuseScore {
-      version: "0.8"
+      version: "0.9"
       title: "Check for Parallels"
       description: "Check for parallel fifths and octaves. Marks consecutive fifths and octaves and also ascending hidden parallels."
       categoryCode: "composing-arranging-tools"
@@ -56,130 +56,138 @@ MuseScore {
             standardButtons: DialogButtonBox.Ok | DialogButtonBox.Cancel
             visible: false
 
-            ColumnLayout {
-                  anchors.fill: parent
-                  spacing: 10
+            ScrollView {
+                  Layout.fillWidth: true
+                  Layout.fillHeight: true
 
-                  GroupBox {
-                        title: "Detection Options"
-                        Layout.fillWidth: true
+                  ColumnLayout {
+                        anchors.fill: parent
+                        spacing: 10
 
-                        ColumnLayout {
-                              CheckBox { id: fifthsCheckbox; text: "Parallel Fifths"; checked: detectFifths; onClicked: {detectFifths = !detectFifths} }
-                              CheckBox { id: octavesCheckbox; text: "Parallel Octaves"; checked: detectOctaves; onClicked: {detectOctaves = !detectOctaves} }
-                              CheckBox { id: hiddenFifthsCheckbox; text: "Hidden Fifths"; checked: detectHiddenFifths; onClicked: {detectHiddenFifths = !detectHiddenFifths} }
-                              CheckBox { id: hiddenOctavesCheckbox; text: "Hidden Octaves"; checked: detectHiddenOctaves; onClicked: {detectHiddenOctaves = !detectHiddenOctaves} }
-                        }
-                  }
+                        GroupBox {
+                              title: "Detection Options"
+                              Layout.fillWidth: true
 
-                  GroupBox {
-                        title: "Marking Options"
-                        Layout.fillWidth: true
-
-                        ColumnLayout {
-                              CheckBox { id: onlyColorCheckbox; text: "Only color notes (no StaffText)"; checked: onlyColor; onClicked: {onlyColor = !onlyColor} }
-                              CheckBox {
-                                    id: testRunCheckbox
-                                    text: "No markings (Dry run)"
-                                    checked: dryRun
-                                    onClicked: {dryRun = !dryRun}
+                              ColumnLayout {
+                                    CheckBox { id: fifthsCheckbox; text: "Parallel Fifths"; checked: detectFifths; onClicked: {detectFifths = !detectFifths} }
+                                    CheckBox { id: octavesCheckbox; text: "Parallel Octaves"; checked: detectOctaves; onClicked: {detectOctaves = !detectOctaves} }
+                                    CheckBox { id: hiddenFifthsCheckbox; text: "Hidden Fifths"; checked: detectHiddenFifths; onClicked: {detectHiddenFifths = !detectHiddenFifths} }
+                                    CheckBox { id: hiddenOctavesCheckbox; text: "Hidden Octaves"; checked: detectHiddenOctaves; onClicked: {detectHiddenOctaves = !detectHiddenOctaves} }
                               }
                         }
-                  }
 
-                  GroupBox {
-                        title: "Colors"
-                        Layout.fillWidth: true
-
-                        ColumnLayout {
-                              spacing: 15
+                        GroupBox {
+                              title: "Marking Options"
+                              Layout.fillWidth: true
 
                               ColumnLayout {
-                                    spacing: 5
-                                    Label {
-                                          id: fifthColorLabel
-                                          text: "Fifth Color"
-                                          Layout.fillWidth: true
-                                          font.bold: true
-                                    }
-                                    RowLayout {
-                                          spacing: 10
-                                          Rectangle {
-                                                width: 20
-                                                height: 20
-                                                color: colorFifth
-                                                radius: 5  // Use radius to create a circle. If you want a square, just remove this line.
-                                          }
-                                          Label {
-                                                id: fifthColorValueLabel
-                                                text: colorFifth
-                                          }
-                                    }
-                                    Button {
-                                          text: "Change Fifth Color"
-                                          onClicked: {
-                                                var newColor = colorPickerModel.selectColor(colorFifth)
-                                                if (newColor) colorFifth = newColor
-                                          }
+                                    CheckBox { id: onlyColorCheckbox; text: "Only color notes (no StaffText)"; checked: onlyColor; onClicked: {onlyColor = !onlyColor} }
+                                    CheckBox {
+                                          id: testRunCheckbox
+                                          text: "No markings (Dry run)"
+                                          checked: dryRun
+                                          onClicked: {dryRun = !dryRun}
                                     }
                               }
+                        }
+
+                        GroupBox {
+                              title: "Colors"
+                              Layout.fillWidth: true
 
                               ColumnLayout {
-                                    spacing: 5
-                                    Label {
-                                          id: octaveColorLabel
-                                          text: "Octave Color"
-                                          Layout.fillWidth: true
-                                          font.bold: true
-                                    }
-                                    RowLayout {
-                                          spacing: 10
-                                          Rectangle {
-                                                width: 20
-                                                height: 20
-                                                color: colorOctave
-                                                radius: 5  // Circle shape, remove for square
-                                          }
-                                          Label {
-                                                id: octaveColorValueLabel
-                                                text: colorOctave
-                                          }
-                                    }
-                                    Button {
-                                          text: "Change Octave Color"
-                                          onClicked: {
-                                                var newColor = colorPickerModel.selectColor(colorOctave)
-                                                if (newColor) colorOctave = newColor
-                                          }
-                                    }
-                              }
+                                    spacing: 15
 
-                              ColumnLayout {
-                                    spacing: 5
-                                    Label {
-                                          id: hiddenColorLabel
-                                          text: "Hidden Parallel Color"
-                                          Layout.fillWidth: true
-                                          font.bold: true
-                                    }
-                                    RowLayout {
-                                          spacing: 10
-                                          Rectangle {
-                                                width: 20
-                                                height: 20
-                                                color: colorHidden
-                                                radius: 5  // Circle shape, remove for square
-                                          }
+                                    ColumnLayout {
+                                          spacing: 5
                                           Label {
-                                                id: hiddenColorValueLabel
-                                                text: colorHidden
+                                                id: fifthColorLabel
+                                                text: "Fifths"
+                                                Layout.fillWidth: true
+                                                font.bold: true
+                                          }
+                                          RowLayout {
+                                                spacing: 10
+                                                Rectangle {
+                                                      width: 20
+                                                      height: 20
+                                                      color: colorFifth
+                                                      radius: 5
+
+                                                      MouseArea {
+                                                            anchors.fill: parent
+                                                            onClicked: {
+                                                                  var newColor = colorPickerModel.selectColor(colorFifth)
+                                                                  if (newColor) colorFifth = newColor
+                                                            }
+                                                      }
+                                                }
+                                                Label {
+                                                      id: fifthColorValueLabel
+                                                      text: colorFifth
+                                                }
                                           }
                                     }
-                                    Button {
-                                          text: "Change Hidden Parallel Color"
-                                          onClicked: {
-                                                var newColor = colorPickerModel.selectColor(colorHidden)
-                                                if (newColor) colorHidden = newColor
+
+                                    ColumnLayout {
+                                          spacing: 5
+                                          Label {
+                                                id: octaveColorLabel
+                                                text: "Octaves"
+                                                Layout.fillWidth: true
+                                                font.bold: true
+                                          }
+                                          RowLayout {
+                                                spacing: 10
+                                                Rectangle {
+                                                      width: 20
+                                                      height: 20
+                                                      color: colorOctave
+                                                      radius: 5
+
+                                                      MouseArea {
+                                                            anchors.fill: parent
+                                                            onClicked: {
+                                                                  var newColor = colorPickerModel.selectColor(colorOctave)
+                                                                  if (newColor) colorOctave = newColor
+                                                            }
+                                                      }
+                                                }
+                                                Label {
+                                                      id: octaveColorValueLabel
+                                                      text: colorOctave
+                                                }
+                                          }
+                                    }
+
+                                    ColumnLayout {
+                                          spacing: 5
+                                          Label {
+                                                id: hiddenColorLabel
+                                                text: "Hidden Parallels"
+                                                Layout.fillWidth: true
+                                                font.bold: true
+                                          }
+                                          RowLayout {
+                                                spacing: 10
+                                                Rectangle {
+                                                      width: 20
+                                                      height: 20
+                                                      color: colorHidden
+                                                      radius: 5
+
+                                                      MouseArea {
+                                                            anchors.fill: parent
+                                                            onClicked: {
+                                                                  var newColor = colorPickerModel.selectColor(colorHidden)
+                                                                  if (newColor) colorHidden = newColor
+                                                            }
+                                                      }
+                                                }
+                                                Label {
+                                                      id: hiddenColorValueLabel
+                                                      text: colorHidden
+                                                }
                                           }
                                     }
                               }
