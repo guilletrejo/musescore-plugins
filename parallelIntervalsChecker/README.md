@@ -6,7 +6,7 @@
 
 ## Features
 
-<img src="/parallelIntervalsChecker/screenshot.png" align="right" />
+<img src="/parallelIntervalsChecker/screenshot.png" align="right" width="260px" />
 
 - **Detect Parallel Fifths**  
   Identifies consecutive fifth intervals that are parallel between voices.
