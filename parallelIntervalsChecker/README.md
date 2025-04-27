@@ -6,6 +6,8 @@
 
 ## Features
 
+<img src="/parallelIntervalsChecker/screenshot.png" align="right" />
+
 - **Detect Parallel Fifths**  
   Identifies consecutive fifth intervals that are parallel between voices.
 
@@ -42,12 +44,6 @@ To install the **Parallel Intervals Checker** plugin:
 1. Open MuseScore Studio 4 and activate the plugin on the `Home` page under the tab `Plugins`
 
 Once activated, the plugin will appear in the `Plugins` menu.
-
----
-
-## Screenshot
-
-![screenshot](/parallelIntervalsChecker/screenshot.png)
 
 ---
 
