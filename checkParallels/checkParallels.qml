@@ -217,7 +217,7 @@ MuseScore {
       MessageDialog {
             id: msgResult
             title: "Result"
-            text: "Not yet set"
+            text: ""
             onAccepted: { quit() }
             visible: false
       }
