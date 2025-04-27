@@ -190,7 +190,7 @@ MuseScore {
             }
       }
 
-      function sgn(x) { return x > 0 ? 1 : x < 0 ? -1 : 0 }
+      function signOfDifference(x) { return x > 0 ? 1 : x < 0 ? -1 : 0 }
 
       function markColor(note1, note2, color) {
             note1.color = color
@@ -326,11 +326,11 @@ MuseScore {
       function findParallels(startTrack, endTrack, data, segment) {
             for (var track = startTrack; track < endTrack; track++) {
                   if (data.changed[track] && !data.prevRest[track]) {
-                        var dir1 = sgn(data.curNote[track].pitch - data.prevNote[track].pitch)
+                        var dir1 = signOfDifference(data.curNote[track].pitch - data.prevNote[track].pitch)
                         if (dir1 === 0) continue
                         for (var i = track + 1; i < endTrack; i++) {
                               if (data.changed[i] && !data.prevRest[i]) {
-                                    var dir2 = sgn(data.curNote[i].pitch - data.prevNote[i].pitch)
+                                    var dir2 = signOfDifference(data.curNote[i].pitch - data.prevNote[i].pitch)
                                     if (dir1 === dir2) {
                                           checkInterval(track, i, dir1, data, segment)
                                     }
