@@ -15,8 +15,8 @@ MuseScore {
       requiresScore: true
       pluginType: "dialog"
 
-      implicitHeight: 550
-      implicitWidth: 300
+      implicitHeight: 465
+      implicitWidth: 230
 
       property var colorFifth: "#ff6500"
       property var colorOctave: "#ff0050"
@@ -80,22 +80,34 @@ MuseScore {
                         Layout.fillWidth: true
 
                         ColumnLayout {
+                              Label {
+                                    id: fifthColorLabel
+                                    text: "Fifth Color: " + colorFifth
+                              }
                               Button {
-                                    text: "Select Fifth Color"
+                                    text: "Change Fifth Color"
                                     onClicked: {
                                           var newColor = colorPickerModel.selectColor(colorFifth)
                                           if (newColor) colorFifth = newColor
                                     }
                               }
+                              Label {
+                                    id: octaveColorLabel
+                                    text: "Octave Color: " + colorOctave
+                              }
                               Button {
-                                    text: "Select Octave Color"
+                                    text: "Change Octave Color"
                                     onClicked: {
                                           var newColor = colorPickerModel.selectColor(colorOctave)
                                           if (newColor) colorOctave = newColor
                                     }
                               }
+                              Label {
+                                    id: hiddenColorLabel
+                                    text: "Hidden Parallel Color: " + colorHidden
+                              }
                               Button {
-                                    text: "Select Hidden Parallel Color"
+                                    text: "Change Hidden Parallel Color"
                                     onClicked: {
                                           var newColor = colorPickerModel.selectColor(colorHidden)
                                           if (newColor) colorHidden = newColor
