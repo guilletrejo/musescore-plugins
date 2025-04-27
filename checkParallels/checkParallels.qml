@@ -3,7 +3,7 @@ import FileIO 3.0
 import MuseScore 3.0
 
 MuseScore {
-      version: "0.3"
+      version: "0.5"
       title: "Check for Parallel 5ths/8ves [DEV]"
       description: "Check for parallel fifths and octaves. Marks consecutive fifths and octaves and also ascending hidden parallels."
       categoryCode: "composing-arranging-tools"
