@@ -7,7 +7,7 @@ import MuseScore 3.0
 import Muse.UiComponents 1.0
 
 MuseScore {
-      version: "0.6"
+      version: "0.7"
       title: "Check for Parallels"
       description: "Check for parallel fifths and octaves. Marks consecutive fifths and octaves and also ascending hidden parallels."
       categoryCode: "composing-arranging-tools"
@@ -15,7 +15,7 @@ MuseScore {
       requiresScore: true
       pluginType: "dialog"
 
-      implicitHeight: 495
+      implicitHeight: 570
       implicitWidth: 230
 
       property var colorFifth: "#ff6500"
@@ -86,8 +86,21 @@ MuseScore {
                                     spacing: 5
                                     Label {
                                           id: fifthColorLabel
-                                          text: "Fifth Color: " + colorFifth
+                                          text: "Fifth Color:"
                                           Layout.fillWidth: true
+                                    }
+                                    RowLayout {
+                                          spacing: 10
+                                          Rectangle {
+                                                width: 20
+                                                height: 20
+                                                color: colorFifth
+                                                radius: 5  // Use radius to create a circle. If you want a square, just remove this line.
+                                          }
+                                          Label {
+                                                id: fifthColorValueLabel
+                                                text: colorFifth
+                                          }
                                     }
                                     Button {
                                           text: "Change Fifth Color"
@@ -102,8 +115,21 @@ MuseScore {
                                     spacing: 5
                                     Label {
                                           id: octaveColorLabel
-                                          text: "Octave Color: " + colorOctave
+                                          text: "Octave Color:"
                                           Layout.fillWidth: true
+                                    }
+                                    RowLayout {
+                                          spacing: 10
+                                          Rectangle {
+                                                width: 20
+                                                height: 20
+                                                color: colorOctave
+                                                radius: 5  // Circle shape, remove for square
+                                          }
+                                          Label {
+                                                id: octaveColorValueLabel
+                                                text: colorOctave
+                                          }
                                     }
                                     Button {
                                           text: "Change Octave Color"
@@ -118,8 +144,21 @@ MuseScore {
                                     spacing: 5
                                     Label {
                                           id: hiddenColorLabel
-                                          text: "Hidden Parallel Color: " + colorHidden
+                                          text: "Hidden Parallel Color:"
                                           Layout.fillWidth: true
+                                    }
+                                    RowLayout {
+                                          spacing: 10
+                                          Rectangle {
+                                                width: 20
+                                                height: 20
+                                                color: colorHidden
+                                                radius: 5  // Circle shape, remove for square
+                                          }
+                                          Label {
+                                                id: hiddenColorValueLabel
+                                                text: colorHidden
+                                          }
                                     }
                                     Button {
                                           text: "Change Hidden Parallel Color"
