@@ -8,7 +8,7 @@ import Muse.UiComponents 1.0
 
 MuseScore {
       version: "0.6"
-      title: "Check for Parallel 5ths/8ves [DEV]"
+      title: "Check for Parallels"
       description: "Check for parallel fifths and octaves. Marks consecutive fifths and octaves and also ascending hidden parallels."
       categoryCode: "composing-arranging-tools"
       thumbnailName: "logo.png"
@@ -38,14 +38,14 @@ MuseScore {
       Component.onCompleted: {
             if (mscoreMajorVersion >= 4 && mscoreMinorVersion <= 3) {
                   title = "Check for Parallel 5ths/8ves"
-                  thumbnailName = "some_thumbnail.png"
+                  thumbnailName = "logo.png"
                   categoryCode = "composing-arranging-tools"
             }
       }
 
       Dialog {
             id: settingsDialog
-            title: "Parallel 5ths/8ves - Settings"
+            title: "Check for Parallels - Settings"
             modal: true
             standardButtons: DialogButtonBox.Ok | DialogButtonBox.Cancel
             visible: false
