@@ -369,7 +369,7 @@ MuseScore {
       }
 
       function handleRest(track, data) {
-            if (!data.curRest[track]) {
+            if (!data.curRest[track]) { // only detect when transitioning from note to rest (not for multiple rests)
                   data.prevRest[track] = data.curRest[track]
                   data.prevNote[track] = data.curNote[track]
                   data.curRest[track] = true
