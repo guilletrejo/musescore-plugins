@@ -33,6 +33,11 @@ MuseScore {
       property bool detectHiddenFifths: true
       property bool detectHiddenOctaves: true
 
+      property var detectedFifths: 0
+      property var detectedOctaves: 0
+      property var detectedHiddenFifths: 0
+      property var detectedHiddenOctaves: 0
+
       id: checkParallels
       ColorPickerModel { id: colorPickerModel }
 
@@ -401,12 +406,14 @@ MuseScore {
             if (!detectFifths && !detectHiddenFifths) return
 
             if (curInterval === prevInterval && detectFifths) {
+                  detectedFifths++
                   data.foundParallels++
                   if (!dryRun) {
                         markText(data.prevNote[track1], data.prevNote[track2], "parallel 5th", colorFifth, track1, data.prevTick[track1])
                         markColor(data.curNote[track1], data.curNote[track2], colorFifth)
                   }
             } else if (dir === 1 && Math.abs(prevInterval) < Math.abs(curInterval) && detectHiddenFifths) {
+                  detectedHiddenFifths++
                   data.foundParallels++
                   if (!dryRun) {
                         markText(data.prevNote[track1], data.prevNote[track2], "hidden 5th", colorHidden, track1, data.prevTick[track1])
@@ -419,12 +426,14 @@ MuseScore {
             if (!detectOctaves && !detectHiddenOctaves) return
 
             if (curInterval === prevInterval && detectOctaves) {
+                  detectedOctaves++
                   data.foundParallels++
                   if (!dryRun) {
                         markText(data.prevNote[track1], data.prevNote[track2], "parallel 8th", colorOctave, track1, data.prevTick[track1])
                         markColor(data.curNote[track1], data.curNote[track2], colorOctave)
                   }
             } else if (dir === 1 && Math.abs(prevInterval) < Math.abs(curInterval) && detectHiddenOctaves) {
+                  detectedHiddenOctaves++
                   data.foundParallels++
                   if (!dryRun) {
                         markText(data.prevNote[track1], data.prevNote[track2], "hidden 8th", colorHidden, track1, data.prevTick[track1])
@@ -437,13 +446,16 @@ MuseScore {
             if (parallels === 0) {
                   msgResult.text = "No parallels found!"
             } else if (parallels === 1) {
-                  msgResult.text = "One parallel found!"
+                  msgResult.text = "One parallel found:"
             } else {
-                  msgResult.text = `${parallels} parallels found!`
+                  msgResult.text = `${parallels} parallels found:`
             }
 
-            if (dryRun) {
-                  msgResult.text += "\n\nFound the following parallels:\n"
+            if (parallels > 0) {
+                  msgResult.text += `\n\nOctaves: ${detectedOctaves}`
+                  msgResult.text += `\nFifths: ${detectedFifths}`
+                  msgResult.text += `\nHidden Octaves: ${detectedOctaves}`
+                  msgResult.text += `\nHidden Fifths: ${detectedHiddenFifths}`
             }
 
             if (chordErrors) {
