@@ -18,9 +18,9 @@ MuseScore {
       implicitHeight: 590
       implicitWidth: 230
 
-      property var colorFifth: "#ff6500"
-      property var colorOctave: "#ff0050"
-      property var colorHidden: "#a03500"
+      property var colorFifth: "#FB8C00"
+      property var colorOctave: "#4285F4"
+      property var colorHidden: "#AB47BC"
 
       property bool onlyColor: false
       property bool dryRun: false
@@ -193,9 +193,9 @@ MuseScore {
                                     Button {
                                           text: "Reset Colors to Default"
                                           onClicked: {
-                                                colorFifth = "#ff6500"
-                                                colorOctave = "#ff0050"
-                                                colorHidden = "#a03500"
+                                                colorFifth = "#FB8C00"
+                                                colorOctave = "#4285F4"
+                                                colorHidden = "#AB47BC"
                                           }
                                     }
                               }
