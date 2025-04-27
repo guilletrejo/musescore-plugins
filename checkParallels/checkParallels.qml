@@ -454,7 +454,7 @@ MuseScore {
             if (parallels > 0) {
                   msgResult.text += `\n\nOctaves: ${detectedOctaves}`
                   msgResult.text += `\nFifths: ${detectedFifths}`
-                  msgResult.text += `\nHidden Octaves: ${detectedOctaves}`
+                  msgResult.text += `\nHidden Octaves: ${detectedHiddenOctaves}`
                   msgResult.text += `\nHidden Fifths: ${detectedHiddenFifths}`
             }
 
