@@ -1,14 +1,22 @@
 import QtQuick 2.15
+import QtQuick.Controls 2.15
+import QtQuick.Layouts 1.15
 import FileIO 3.0
+
 import MuseScore 3.0
+import Muse.UiComponents 1.0
 
 MuseScore {
-      version: "0.5"
+      version: "0.6"
       title: "Check for Parallel 5ths/8ves [DEV]"
       description: "Check for parallel fifths and octaves. Marks consecutive fifths and octaves and also ascending hidden parallels."
       categoryCode: "composing-arranging-tools"
       thumbnailName: "logo.png"
       requiresScore: true
+      pluginType: "dialog"
+
+      implicitHeight: 550
+      implicitWidth: 300
 
       property var colorFifth: "#ff6500"
       property var colorOctave: "#ff0050"
@@ -19,7 +27,13 @@ MuseScore {
       property bool errorChords: false
       property bool cleanupBeforeRun: true
 
+      property bool detectFifths: true
+      property bool detectOctaves: true
+      property bool detectHiddenFifths: true
+      property bool detectHiddenOctaves: true
+
       id: checkParallels
+      ColorPickerModel { id: colorPickerModel }
 
       Component.onCompleted: {
             if (mscoreMajorVersion >= 4 && mscoreMinorVersion <= 3) {
@@ -29,104 +43,156 @@ MuseScore {
             }
       }
 
-      MessageDialog {
-            id: msgResult
-            title: "Result"
-            text: "Not yet set"
-
-            onAccepted: {
-                  quit()
-            }
-
+      Dialog {
+            id: settingsDialog
+            title: "Parallel 5ths/8ves - Settings"
+            modal: true
+            standardButtons: DialogButtonBox.Ok | DialogButtonBox.Cancel
             visible: false
-      }
 
-      // Set color to black
-      function resetColor(note) {
-            note.color = "#000000"
-      }
+            ColumnLayout {
+                  anchors.fill: parent
+                  spacing: 10
 
-      // Cleanup function: remove previous text and reset colors
-      function cleanupOldMarkings() {
-            var markingsToRemove = ["parallel 5th", "hidden 5th", "parallel 8th", "hidden 8th"];
+                  GroupBox {
+                        title: "Detection Options"
+                        Layout.fillWidth: true
 
-            var cursor = curScore.newCursor();
-            cursor.rewind(0);
+                        ColumnLayout {
+                              CheckBox { id: fifthsCheckbox; text: "Detect Parallel Fifths"; checked: detectFifths; onClicked: {detectFifths = !detectFifths} }
+                              CheckBox { id: octavesCheckbox; text: "Detect Parallel Octaves"; checked: detectOctaves; onClicked: {detectOctaves = !detectOctaves} }
+                              CheckBox { id: hiddenFifthsCheckbox; text: "Detect Hidden Fifths"; checked: detectHiddenFifths; onClicked: {detectHiddenFifths = !detectHiddenFifths} }
+                              CheckBox { id: hiddenOctavesCheckbox; text: "Detect Hidden Octaves"; checked: detectHiddenOctaves; onClicked: {detectHiddenOctaves = !detectHiddenOctaves} }
+                        }
+                  }
 
-            while (cursor.segment) {
-                  var segment = cursor.segment;
+                  GroupBox {
+                        title: "Marking Options"
+                        Layout.fillWidth: true
 
-                  // FIRST: check annotations (e.g., StaffText)
-                  if (segment.annotations) {
-                        for (var i = 0; i < segment.annotations.length; i++) {
-                              var annotation = segment.annotations[i];
-                              console.log("Annotation type:", annotation.type, "Text:", annotation.text);
-                              if (annotation && annotation.type === Element.STAFF_TEXT) {
-                                    if (markingsToRemove.indexOf(annotation.text) !== -1) {
-                                          console.log("This annotation will be removed now...");
-                                          removeElement(annotation);
+                        ColumnLayout {
+                              CheckBox { id: onlyColorCheckbox; text: "Only color notes (no StaffText)"; checked: onlyColor; onClicked: {onlyColor = !onlyColor} }
+                        }
+                  }
+
+                  GroupBox {
+                        title: "Colors"
+                        Layout.fillWidth: true
+
+                        ColumnLayout {
+                              Button {
+                                    text: "Select Fifth Color"
+                                    onClicked: {
+                                          var newColor = colorPickerModel.selectColor(colorFifth)
+                                          if (newColor) colorFifth = newColor
+                                    }
+                              }
+                              Button {
+                                    text: "Select Octave Color"
+                                    onClicked: {
+                                          var newColor = colorPickerModel.selectColor(colorOctave)
+                                          if (newColor) colorOctave = newColor
+                                    }
+                              }
+                              Button {
+                                    text: "Select Hidden Parallel Color"
+                                    onClicked: {
+                                          var newColor = colorPickerModel.selectColor(colorHidden)
+                                          if (newColor) colorHidden = newColor
                                     }
                               }
                         }
                   }
+            }
 
-                  // SECOND: check notes (chords)
-                  for (var track = 0; track < curScore.ntracks; track++) {
-                        var element = segment.elementAt(track);
-                        if (!element)
-                              continue;
+            onAccepted: {
+                  console.log("Settings saved. Running plugin...")
+                  startCheck() // <- Now run plugin
+            }
 
-                        if (element.type === Element.CHORD) {
-                              for (var i = 0; i < element.notes.length; i++) {
-                              var note = element.notes[i];
-                              resetColor(note);
+            onRejected: {
+                  console.log("Settings canceled.")
+                  quit()
+            }
+      }
+
+      MessageDialog {
+            id: msgResult
+            title: "Result"
+            text: "Not yet set"
+            onAccepted: { quit() }
+            visible: false
+      }
+
+      function openSettings() {
+            settingsDialog.open()
+      }
+
+      // Helper to reset color
+      function resetColor(note) { note.color = "#000000" }
+
+      // Cleanup function
+      function cleanupOldMarkings() {
+            var markingsToRemove = ["parallel 5th", "hidden 5th", "parallel 8th", "hidden 8th"]
+            var cursor = curScore.newCursor()
+            cursor.rewind(0)
+
+            while (cursor.segment) {
+                  var segment = cursor.segment
+                  if (segment.annotations) {
+                        for (var i = 0; i < segment.annotations.length; i++) {
+                              var annotation = segment.annotations[i]
+                              if (annotation && annotation.type === Element.STAFF_TEXT && markingsToRemove.indexOf(annotation.text) !== -1) {
+                                    removeElement(annotation)
                               }
                         }
                   }
 
-                  cursor.next();
+                  for (var track = 0; track < curScore.ntracks; track++) {
+                        var element = segment.elementAt(track)
+                        if (!element) continue
+                        if (element.type === Element.CHORD) {
+                              for (var i = 0; i < element.notes.length; i++) {
+                                    resetColor(element.notes[i])
+                              }
+                        }
                   }
+
+                  cursor.next()
+            }
       }
 
-      // Utility function to return the sign of a number
-      function sgn(x) {
-            return x > 0 ? 1 : x < 0 ? -1 : 0
-      }
+      function sgn(x) { return x > 0 ? 1 : x < 0 ? -1 : 0 }
 
-      // Function to set the color of two notes
       function markColor(note1, note2, color) {
             note1.color = color
             note2.color = color
       }
 
-      // Function to add text to notes
       function markText(note1, note2, msg, color, trackIndex, tick) {
             markColor(note1, note2, color)
-
-            if (onlyColor) {
-                  return
-            }
+            if (onlyColor) return
 
             var myText = newElement(Element.STAFF_TEXT)
             myText.text = msg
             myText.offsetY = 1
-            
+
             var cursor = curScore.newCursor()
             cursor.rewind(0)
             cursor.track = trackIndex
-            while (cursor.tick < tick) {
-                  cursor.next()
-            }
+            while (cursor.tick < tick) { cursor.next() }
             cursor.add(myText)
       }
 
-      // Main run function
-      onRun: {
-            console.log("start")
+      // --- MAIN CHECKING STARTS HERE ---
+
+      function startCheck() {
             if (!curScore) {
                   console.error("No score found")
                   quit()
+                  return
             }
+
             curScore.startCmd()
 
             if (cleanupBeforeRun) {
@@ -134,31 +200,24 @@ MuseScore {
                   cleanupOldMarkings()
             }
 
-            // Define the start and end of the area to be checked
             var startStaff, endStaff, endTick
             var cursor = curScore.newCursor()
             cursor.rewind(1)
 
             if (!cursor.segment) {
-                  // No selection, process entire score
-                  console.log("No selection: processing whole score")
                   processAll = true
                   startStaff = 0
                   endStaff = curScore.nstaves
             } else {
-                  // There is a selection
                   startStaff = cursor.staffIdx
                   cursor.rewind(2)
                   endStaff = cursor.staffIdx + 1
                   endTick = cursor.tick || curScore.lastSegment.tick + 1
                   cursor.rewind(1)
-                  console.log(`Selection is: Staves(${startStaff}-${endStaff}) Ticks(${cursor.tick}-${endTick})`)
             }
 
-            // Initialize data structure for checking parallels
-            var parallelCheckData = initializeParallelCheckData(startStaff, endStaff)
+            var data = initializeParallelCheckData(startStaff, endStaff)
 
-            // Traverse through the staves/voices
             if (processAll) {
                   cursor.track = 0
                   cursor.rewind(0)
@@ -167,33 +226,18 @@ MuseScore {
             }
 
             var segment = cursor.segment
-
             while (segment && (processAll || segment.tick < endTick)) {
-                  handleSegment(segment, startStaff, endStaff, parallelCheckData)
+                  handleSegment(segment, startStaff, endStaff, data)
                   segment = segment.next
             }
 
-            // Show results
-            showResults(parallelCheckData.foundParallels, parallelCheckData.errorChords)
+            showResults(data.foundParallels, data.errorChords)
             curScore.endCmd()
-            console.log("finished")
             msgResult.visible = true
       }
 
-      // Initialize data for checking parallels
       function initializeParallelCheckData(startStaff, endStaff) {
-            var data = {
-                  changed: [],
-                  curNote: [],
-                  prevNote: [],
-                  curRest: [],
-                  prevRest: [],
-                  curTick: [],
-                  prevTick: [],
-                  foundParallels: 0,
-                  errorChords: false,
-            }
-
+            var data = { changed: [], curNote: [], prevNote: [], curRest: [], prevRest: [], curTick: [], prevTick: [], foundParallels: 0, errorChords: false }
             var startTrack = startStaff * 4
             var endTrack = endStaff * 4
 
@@ -210,41 +254,27 @@ MuseScore {
             return data
       }
 
-      // Process each segment
       function handleSegment(segment, startStaff, endStaff, data) {
             var startTrack = startStaff * 4
             var endTrack = endStaff * 4
 
-            // Read notes
             for (var track = startTrack; track < endTrack; track++) {
                   var element = segment.elementAt(track)
                   if (element) {
-                        if (element.type == Element.CHORD) {
-                              // Handle chords (ignore grace notes)
-                              handleChord(element, track, segment, data)
-                        } else if (element.type == Element.REST) {
-                              // Handle rests
-                              handleRest(track, data)
-                        } else {
-                              data.changed[track] = false
-                        }
+                        if (element.type == Element.CHORD) handleChord(element, track, segment, data)
+                        else if (element.type == Element.REST) handleRest(track, data)
+                        else data.changed[track] = false
                   } else {
                         data.changed[track] = false
                   }
             }
 
-            // Find parallels
             findParallels(startTrack, endTrack, data, segment)
       }
 
-      // Handle chord elements
       function handleChord(chord, track, segment, data) {
             var notes = chord.notes
-
-            if (notes.length > 1) {
-                  console.warn("Found chord with more than one note!")
-                  data.errorChords = true
-            }
+            if (notes.length > 1) data.errorChords = true
 
             var note = notes[notes.length - 1]
             data.prevTick[track] = data.curTick[track]
@@ -256,24 +286,20 @@ MuseScore {
             data.changed[track] = true
       }
 
-      // Handle rest elements
       function handleRest(track, data) {
             if (!data.curRest[track]) {
-                  // Was a note
                   data.prevRest[track] = data.curRest[track]
                   data.prevNote[track] = data.curNote[track]
                   data.curRest[track] = true
-                  data.changed[track] = false // No need to check against a rest
+                  data.changed[track] = false
             }
       }
 
-      // Check for parallel fifths and octaves
       function findParallels(startTrack, endTrack, data, segment) {
             for (var track = startTrack; track < endTrack; track++) {
-                  // Compare to other tracks
                   if (data.changed[track] && !data.prevRest[track]) {
                         var dir1 = sgn(data.curNote[track].pitch - data.prevNote[track].pitch)
-                        if (dir1 === 0) continue // Voice didn't move
+                        if (dir1 === 0) continue
                         for (var i = track + 1; i < endTrack; i++) {
                               if (data.changed[i] && !data.prevRest[i]) {
                                     var dir2 = sgn(data.curNote[i].pitch - data.prevNote[i].pitch)
@@ -286,64 +312,57 @@ MuseScore {
             }
       }
 
-      // Check intervals for fifths and octaves
       function checkInterval(track1, track2, dir, data, segment) {
             var curInterval = data.curNote[track1].pitch - data.curNote[track2].pitch
             var prevInterval = data.prevNote[track1].pitch - data.prevNote[track2].pitch
 
-            if (Math.abs(curInterval % 12) === 7) { // Check fifths
-                  checkFifths(curInterval, prevInterval, dir, track1, track2, data)
-            }
-
-            if (Math.abs(curInterval % 12) === 0) { // Check octaves
-                  checkOctaves(curInterval, prevInterval, dir, track1, track2, data, segment)
-            }
+            if (Math.abs(curInterval % 12) === 7) checkFifths(curInterval, prevInterval, dir, track1, track2, data)
+            if (Math.abs(curInterval % 12) === 0) checkOctaves(curInterval, prevInterval, dir, track1, track2, data)
       }
 
-      // Check for parallel fifths
       function checkFifths(curInterval, prevInterval, dir, track1, track2, data) {
-            if (curInterval === prevInterval) {
+            if (!detectFifths && !detectHiddenFifths) return
+
+            if (curInterval === prevInterval && detectFifths) {
                   data.foundParallels++
-                  console.log(`P5: ${curInterval}, ${prevInterval}`)
                   markText(data.prevNote[track1], data.prevNote[track2], "parallel 5th", colorFifth, track1, data.prevTick[track1])
                   markColor(data.curNote[track1], data.curNote[track2], colorFifth)
-            } else if (dir === 1 && Math.abs(prevInterval) < Math.abs(curInterval)) {
-                  // Hidden parallel
+            } else if (dir === 1 && Math.abs(prevInterval) < Math.abs(curInterval) && detectHiddenFifths) {
                   data.foundParallels++
-                  console.log(`H5: ${curInterval}, ${prevInterval}`)
                   markText(data.prevNote[track1], data.prevNote[track2], "hidden 5th", colorHidden, track1, data.prevTick[track1])
                   markColor(data.curNote[track1], data.curNote[track2], colorHidden)
             }
       }
 
-      // Check for parallel octaves
       function checkOctaves(curInterval, prevInterval, dir, track1, track2, data) {
-            if (curInterval === prevInterval) {
+            if (!detectOctaves && !detectHiddenOctaves) return
+
+            if (curInterval === prevInterval && detectOctaves) {
                   data.foundParallels++
-                  console.log(`P8: ${curInterval}, ${prevInterval}`)
                   markText(data.prevNote[track1], data.prevNote[track2], "parallel 8th", colorOctave, track1, data.prevTick[track1])
                   markColor(data.curNote[track1], data.curNote[track2], colorOctave)
-            } else if (dir === 1 && Math.abs(prevInterval) < Math.abs(curInterval)) {
-                  // Hidden parallel
+            } else if (dir === 1 && Math.abs(prevInterval) < Math.abs(curInterval) && detectHiddenOctaves) {
                   data.foundParallels++
-                  console.log(`H8: ${curInterval}, ${prevInterval}`)
                   markText(data.prevNote[track1], data.prevNote[track2], "hidden 8th", colorHidden, track1, data.prevTick[track1])
                   markColor(data.curNote[track1], data.curNote[track2], colorHidden)
             }
       }
 
-      // Display results
       function showResults(parallels, chordErrors) {
             if (parallels === 0) {
-                  msgResult.text = "No parallels found!\n"
+                  msgResult.text = "No parallels found!"
             } else if (parallels === 1) {
-                  msgResult.text = "One parallel found!\n"
+                  msgResult.text = "One parallel found!"
             } else {
-                  msgResult.text = `${parallels} parallels found!\n`
+                  msgResult.text = `${parallels} parallels found!`
             }
 
             if (chordErrors) {
-                  msgResult.text += "\nError: Found Chords!\nOnly the top note of each voice is used in this plugin!\n"
+                  msgResult.text += "\n\nWarning: Found chords (multiple notes per voice). Only top note used!"
             }
+      }
+
+      onRun: {
+            openSettings()
       }
 }
