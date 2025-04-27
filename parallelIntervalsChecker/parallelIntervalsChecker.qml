@@ -7,15 +7,15 @@ import MuseScore 3.0
 import Muse.UiComponents 1.0
 
 MuseScore {
-      version: "0.9"
-      title: "Check for Parallels"
-      description: "Check for parallel fifths and octaves. Marks consecutive fifths and octaves and also ascending hidden parallels."
+      version: "1.0"
+      title: "Parallel Intervals Checker"
+      description: "Identify and highlight parallel fifths, octaves, and hidden parallels in your score. This tool marks consecutive fifths and octaves, as well as ascending hidden parallels, for easy visualization and correction."
       categoryCode: "composing-arranging-tools"
       thumbnailName: "logo.png"
       requiresScore: true
       pluginType: "dialog"
 
-      implicitHeight: 590
+      implicitHeight: 580
       implicitWidth: 230
 
       property var colorFifth: "#FB8C00"
@@ -43,7 +43,7 @@ MuseScore {
 
       Component.onCompleted: {
             if (mscoreMajorVersion >= 4 && mscoreMinorVersion <= 3) {
-                  title = "Check for Parallel 5ths/8ves"
+                  title = "Parallel Intervals Checker"
                   thumbnailName = "logo.png"
                   categoryCode = "composing-arranging-tools"
             }
@@ -51,7 +51,7 @@ MuseScore {
 
       Dialog {
             id: settingsDialog
-            title: "Check for Parallels - Settings"
+            title: "Settings"
             modal: true
             standardButtons: DialogButtonBox.Ok | DialogButtonBox.Cancel
             visible: false
@@ -65,7 +65,7 @@ MuseScore {
                         spacing: 10
 
                         GroupBox {
-                              title: "Detection Options"
+                              title: "Detection"
                               Layout.fillWidth: true
 
                               ColumnLayout {
@@ -77,7 +77,7 @@ MuseScore {
                         }
 
                         GroupBox {
-                              title: "Marking Options"
+                              title: "Marking"
                               Layout.fillWidth: true
 
                               ColumnLayout {
@@ -92,7 +92,7 @@ MuseScore {
                         }
 
                         GroupBox {
-                              title: "Colors"
+                              title: "Color"
                               Layout.fillWidth: true
 
                               ColumnLayout {
