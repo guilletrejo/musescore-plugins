@@ -59,10 +59,10 @@ MuseScore {
                         Layout.fillWidth: true
 
                         ColumnLayout {
-                              CheckBox { id: fifthsCheckbox; text: "Detect Parallel Fifths"; checked: detectFifths; onClicked: {detectFifths = !detectFifths} }
-                              CheckBox { id: octavesCheckbox; text: "Detect Parallel Octaves"; checked: detectOctaves; onClicked: {detectOctaves = !detectOctaves} }
-                              CheckBox { id: hiddenFifthsCheckbox; text: "Detect Hidden Fifths"; checked: detectHiddenFifths; onClicked: {detectHiddenFifths = !detectHiddenFifths} }
-                              CheckBox { id: hiddenOctavesCheckbox; text: "Detect Hidden Octaves"; checked: detectHiddenOctaves; onClicked: {detectHiddenOctaves = !detectHiddenOctaves} }
+                              CheckBox { id: fifthsCheckbox; text: "Parallel Fifths"; checked: detectFifths; onClicked: {detectFifths = !detectFifths} }
+                              CheckBox { id: octavesCheckbox; text: "Parallel Octaves"; checked: detectOctaves; onClicked: {detectOctaves = !detectOctaves} }
+                              CheckBox { id: hiddenFifthsCheckbox; text: "Hidden Fifths"; checked: detectHiddenFifths; onClicked: {detectHiddenFifths = !detectHiddenFifths} }
+                              CheckBox { id: hiddenOctavesCheckbox; text: "Hidden Octaves"; checked: detectHiddenOctaves; onClicked: {detectHiddenOctaves = !detectHiddenOctaves} }
                         }
                   }
 
