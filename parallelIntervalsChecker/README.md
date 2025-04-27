@@ -45,6 +45,12 @@ Once activated, the plugin will appear in the `Plugins` menu.
 
 ---
 
+## Screenshot
+
+![screenshot](/parallelIntervalsChecker/screenshot.png)
+
+---
+
 ## Usage
 
 1. **Open your score** in MuseScore.
