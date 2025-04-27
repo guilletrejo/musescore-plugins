@@ -15,7 +15,7 @@ MuseScore {
       requiresScore: true
       pluginType: "dialog"
 
-      implicitHeight: 465
+      implicitHeight: 495
       implicitWidth: 230
 
       property var colorFifth: "#ff6500"
@@ -80,37 +80,53 @@ MuseScore {
                         Layout.fillWidth: true
 
                         ColumnLayout {
-                              Label {
-                                    id: fifthColorLabel
-                                    text: "Fifth Color: " + colorFifth
-                              }
-                              Button {
-                                    text: "Change Fifth Color"
-                                    onClicked: {
-                                          var newColor = colorPickerModel.selectColor(colorFifth)
-                                          if (newColor) colorFifth = newColor
+                              spacing: 15
+
+                              ColumnLayout {
+                                    spacing: 5
+                                    Label {
+                                          id: fifthColorLabel
+                                          text: "Fifth Color: " + colorFifth
+                                          Layout.fillWidth: true
+                                    }
+                                    Button {
+                                          text: "Change Fifth Color"
+                                          onClicked: {
+                                                var newColor = colorPickerModel.selectColor(colorFifth)
+                                                if (newColor) colorFifth = newColor
+                                          }
                                     }
                               }
-                              Label {
-                                    id: octaveColorLabel
-                                    text: "Octave Color: " + colorOctave
-                              }
-                              Button {
-                                    text: "Change Octave Color"
-                                    onClicked: {
-                                          var newColor = colorPickerModel.selectColor(colorOctave)
-                                          if (newColor) colorOctave = newColor
+
+                              ColumnLayout {
+                                    spacing: 5
+                                    Label {
+                                          id: octaveColorLabel
+                                          text: "Octave Color: " + colorOctave
+                                          Layout.fillWidth: true
+                                    }
+                                    Button {
+                                          text: "Change Octave Color"
+                                          onClicked: {
+                                                var newColor = colorPickerModel.selectColor(colorOctave)
+                                                if (newColor) colorOctave = newColor
+                                          }
                                     }
                               }
-                              Label {
-                                    id: hiddenColorLabel
-                                    text: "Hidden Parallel Color: " + colorHidden
-                              }
-                              Button {
-                                    text: "Change Hidden Parallel Color"
-                                    onClicked: {
-                                          var newColor = colorPickerModel.selectColor(colorHidden)
-                                          if (newColor) colorHidden = newColor
+
+                              ColumnLayout {
+                                    spacing: 5
+                                    Label {
+                                          id: hiddenColorLabel
+                                          text: "Hidden Parallel Color: " + colorHidden
+                                          Layout.fillWidth: true
+                                    }
+                                    Button {
+                                          text: "Change Hidden Parallel Color"
+                                          onClicked: {
+                                                var newColor = colorPickerModel.selectColor(colorHidden)
+                                                if (newColor) colorHidden = newColor
+                                          }
                                     }
                               }
                         }
