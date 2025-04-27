@@ -14,6 +14,7 @@ MuseScore {
       property var colorOctave: "#ff0050"
       property var colorHidden: "#a03500"
 
+      property bool onlyColor: false
       property bool processAll: false
       property bool errorChords: false
       property bool cleanupBeforeRun: true
@@ -101,6 +102,11 @@ MuseScore {
       // Function to add text to notes
       function markText(note1, note2, msg, color, trackIndex, tick) {
             markColor(note1, note2, color)
+
+            if (onlyColor) {
+                  return
+            }
+
             var myText = newElement(Element.STAFF_TEXT)
             myText.text = msg
             myText.offsetY = 1
