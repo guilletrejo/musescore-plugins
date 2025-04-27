@@ -190,6 +190,14 @@ MuseScore {
                                                 }
                                           }
                                     }
+                                    Button {
+                                          text: "Reset Colors to Default"
+                                          onClicked: {
+                                                colorFifth = "#ff6500"
+                                                colorOctave = "#ff0050"
+                                                colorHidden = "#a03500"
+                                          }
+                                    }
                               }
                         }
                   }
