@@ -7,7 +7,7 @@ import MuseScore 3.0
 import Muse.UiComponents 1.0
 
 MuseScore {
-      version: "0.7"
+      version: "0.8"
       title: "Check for Parallels"
       description: "Check for parallel fifths and octaves. Marks consecutive fifths and octaves and also ascending hidden parallels."
       categoryCode: "composing-arranging-tools"
@@ -15,7 +15,7 @@ MuseScore {
       requiresScore: true
       pluginType: "dialog"
 
-      implicitHeight: 570
+      implicitHeight: 590
       implicitWidth: 230
 
       property var colorFifth: "#ff6500"
@@ -23,6 +23,7 @@ MuseScore {
       property var colorHidden: "#a03500"
 
       property bool onlyColor: false
+      property bool dryRun: false
       property bool processAll: false
       property bool errorChords: false
       property bool cleanupBeforeRun: true
@@ -72,6 +73,12 @@ MuseScore {
 
                         ColumnLayout {
                               CheckBox { id: onlyColorCheckbox; text: "Only color notes (no StaffText)"; checked: onlyColor; onClicked: {onlyColor = !onlyColor} }
+                              CheckBox {
+                                    id: testRunCheckbox
+                                    text: "No markings (Dry run)"
+                                    checked: dryRun
+                                    onClicked: {dryRun = !dryRun}
+                              }
                         }
                   }
 
@@ -395,12 +402,16 @@ MuseScore {
 
             if (curInterval === prevInterval && detectFifths) {
                   data.foundParallels++
-                  markText(data.prevNote[track1], data.prevNote[track2], "parallel 5th", colorFifth, track1, data.prevTick[track1])
-                  markColor(data.curNote[track1], data.curNote[track2], colorFifth)
+                  if (!dryRun) {
+                        markText(data.prevNote[track1], data.prevNote[track2], "parallel 5th", colorFifth, track1, data.prevTick[track1])
+                        markColor(data.curNote[track1], data.curNote[track2], colorFifth)
+                  }
             } else if (dir === 1 && Math.abs(prevInterval) < Math.abs(curInterval) && detectHiddenFifths) {
                   data.foundParallels++
-                  markText(data.prevNote[track1], data.prevNote[track2], "hidden 5th", colorHidden, track1, data.prevTick[track1])
-                  markColor(data.curNote[track1], data.curNote[track2], colorHidden)
+                  if (!dryRun) {
+                        markText(data.prevNote[track1], data.prevNote[track2], "hidden 5th", colorHidden, track1, data.prevTick[track1])
+                        markColor(data.curNote[track1], data.curNote[track2], colorHidden)
+                  }
             }
       }
 
@@ -409,12 +420,16 @@ MuseScore {
 
             if (curInterval === prevInterval && detectOctaves) {
                   data.foundParallels++
-                  markText(data.prevNote[track1], data.prevNote[track2], "parallel 8th", colorOctave, track1, data.prevTick[track1])
-                  markColor(data.curNote[track1], data.curNote[track2], colorOctave)
+                  if (!dryRun) {
+                        markText(data.prevNote[track1], data.prevNote[track2], "parallel 8th", colorOctave, track1, data.prevTick[track1])
+                        markColor(data.curNote[track1], data.curNote[track2], colorOctave)
+                  }
             } else if (dir === 1 && Math.abs(prevInterval) < Math.abs(curInterval) && detectHiddenOctaves) {
                   data.foundParallels++
-                  markText(data.prevNote[track1], data.prevNote[track2], "hidden 8th", colorHidden, track1, data.prevTick[track1])
-                  markColor(data.curNote[track1], data.curNote[track2], colorHidden)
+                  if (!dryRun) {
+                        markText(data.prevNote[track1], data.prevNote[track2], "hidden 8th", colorHidden, track1, data.prevTick[track1])
+                        markColor(data.curNote[track1], data.curNote[track2], colorHidden)
+                  }
             }
       }
 
@@ -425,6 +440,10 @@ MuseScore {
                   msgResult.text = "One parallel found!"
             } else {
                   msgResult.text = `${parallels} parallels found!`
+            }
+
+            if (dryRun) {
+                  msgResult.text += "\n\nFound the following parallels:\n"
             }
 
             if (chordErrors) {
