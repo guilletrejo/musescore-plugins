@@ -86,8 +86,9 @@ MuseScore {
                                     spacing: 5
                                     Label {
                                           id: fifthColorLabel
-                                          text: "Fifth Color:"
+                                          text: "Fifth Color"
                                           Layout.fillWidth: true
+                                          font.bold: true
                                     }
                                     RowLayout {
                                           spacing: 10
@@ -115,8 +116,9 @@ MuseScore {
                                     spacing: 5
                                     Label {
                                           id: octaveColorLabel
-                                          text: "Octave Color:"
+                                          text: "Octave Color"
                                           Layout.fillWidth: true
+                                          font.bold: true
                                     }
                                     RowLayout {
                                           spacing: 10
@@ -144,8 +146,9 @@ MuseScore {
                                     spacing: 5
                                     Label {
                                           id: hiddenColorLabel
-                                          text: "Hidden Parallel Color:"
+                                          text: "Hidden Parallel Color"
                                           Layout.fillWidth: true
+                                          font.bold: true
                                     }
                                     RowLayout {
                                           spacing: 10
