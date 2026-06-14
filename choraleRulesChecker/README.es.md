@@ -1,4 +1,6 @@
-# Verificador de Reglas de Coral (estilo Bach) — para MuseScore Studio 4
+# Verificador de Reglas de Coral / Chorale Rules Checker (estilo Bach) — para MuseScore Studio 4
+
+*(English version: [README.md](README.md))*
 
 **Verificador de Reglas de Coral** es un plugin de MuseScore que detecta no solo
 **quintas y octavas paralelas**, sino un conjunto configurable de reglas de
@@ -35,7 +37,7 @@ diálogo, y listada en la tabla de abajo).
 ## Instalación
 
 1. Cloná o descargá este repositorio.
-2. Copiá la carpeta `verificadorCoral/` **completa** a tu carpeta de plugins de
+2. Copiá la carpeta `choraleRulesChecker/` **completa** a tu carpeta de plugins de
    MuseScore (`Configuración > Carpetas > Plugins`, p. ej.
    `~/Documents/MuseScore4/Plugins/`).
 3. Abrí MuseScore Studio 4 y activá el plugin en `Inicio > Plugins`.
@@ -114,11 +116,11 @@ falsos positivos) y vienen **desactivadas** por defecto.
 ## Tests de la lógica
 
 La lógica musical pura (intervalos, grafía con TPC, identificación de acordes,
-grados, duplicaciones, movimiento paralelo) está en `verificadorCoralLogic.js` y
+grados, duplicaciones, movimiento paralelo) está en `choraleRulesLogic.js` y
 se testea con Node, sin necesidad de MuseScore:
 
 ```bash
-node verificadorCoral/test/logic.test.js
+node choraleRulesChecker/test/logic.test.js
 ```
 
 ---
