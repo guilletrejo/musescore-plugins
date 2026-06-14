@@ -50,16 +50,14 @@ MuseScore {
 
       // --- Results ---
       property var findingCounts: ({})
-      property var ruleById: ({})
       property var ruleColor: ({})
 
       // Returns the value for the current language.
-      function tr(en, es) { return lang === "en" ? en : es; }
+      function loc(en, es) { return lang === "en" ? en : es; }
 
       // --- UI strings ---
       readonly property var STR: ({
             "en": {
-                  dialogTitle: "Chorale Rules Checker — Settings",
                   hint: "Hover each rule to see its bibliographic reference.",
                   language: "Language:",
                   key: "Key", tonic: "Tonic:", mode: "Mode:",
@@ -74,7 +72,6 @@ MuseScore {
                   dryNote: "(Dry run: no markings were applied.)"
             },
             "es": {
-                  dialogTitle: "Verificador de Reglas de Coral — Configuración",
                   hint: "Pasá el mouse sobre cada regla para ver su referencia bibliográfica.",
                   language: "Idioma:",
                   key: "Tonalidad", tonic: "Tónica:", mode: "Modo:",
@@ -92,15 +89,17 @@ MuseScore {
       function S(k) { return STR[lang][k]; }
 
       // --- Category titles ---
-      readonly property var CATEGORIES: ({
-            "A": { en: "A · Parallel / direct motion",            es: "A · Movimiento paralelo / directo" },
-            "B": { en: "B · Voice spacing & layout",              es: "B · Disposición de voces" },
-            "C": { en: "C · Melodic line",                        es: "C · Línea melódica" },
-            "D": { en: "D · Doublings (harmonic analysis)",       es: "D · Duplicaciones (análisis armónico)" },
-            "E": { en: "E · Resolutions (harmonic analysis)",     es: "E · Resoluciones (análisis armónico)" },
-            "F": { en: "F · Chord completeness (harmonic analysis)", es: "F · Completitud del acorde (análisis armónico)" }
-      })
-      function catTitle(cat) { return tr(CATEGORIES[cat].en, CATEGORIES[cat].es); }
+      function catTitle(cat) {
+            var t = {
+                  "A": ["A · Parallel / direct motion", "A · Movimiento paralelo / directo"],
+                  "B": ["B · Voice spacing & layout", "B · Disposición de voces"],
+                  "C": ["C · Melodic line", "C · Línea melódica"],
+                  "D": ["D · Doublings (harmonic analysis)", "D · Duplicaciones (análisis armónico)"],
+                  "E": ["E · Resolutions (harmonic analysis)", "E · Resoluciones (análisis armónico)"],
+                  "F": ["F · Chord completeness (harmonic analysis)", "F · Completitud del acorde (análisis armónico)"]
+            };
+            return loc(t[cat][0], t[cat][1]);
+      }
 
       // --- Rule definitions -----------------------------------------------------
       // Melodic / voice-leading rules (A,B,C) are on by default; rules that rely
@@ -188,12 +187,8 @@ MuseScore {
       // Setup
       // =========================================================================
       Component.onCompleted: {
-            var byId = {}, col = {};
-            for (var i = 0; i < RULES.length; i++) {
-                  byId[RULES[i].id] = RULES[i];
-                  col[RULES[i].id] = RULES[i].color;
-            }
-            ruleById = byId;
+            var col = {};
+            for (var i = 0; i < RULES.length; i++) col[RULES[i].id] = RULES[i].color;
             ruleColor = col;
             populateModels();
       }
@@ -231,43 +226,19 @@ MuseScore {
             return false;
       }
 
-      // Inline component: a GroupBox with one checkbox per rule.
-      component RuleGroup: GroupBox {
-            property var ruleModel
-            Layout.fillWidth: true
-            ColumnLayout {
-                  width: parent.width
-                  Repeater {
-                        model: ruleModel
-                        delegate: CheckBox {
-                              text: checker.lang === "en" ? nameEn : nameEs
-                              checked: enabled
-                              Layout.fillWidth: true
-                              onToggled: ruleModel.setProperty(index, "enabled", checked)
-                              ToolTip.visible: hovered
-                              ToolTip.delay: 300
-                              ToolTip.text: cite
-                        }
-                  }
-            }
-      }
-
       Dialog {
             id: settingsDialog
-            title: checker.S("dialogTitle")
+            title: "Chorale Rules Checker"
             modal: true
             standardButtons: DialogButtonBox.Ok | DialogButtonBox.Cancel
             visible: false
-            width: 460
-            height: 620
 
             ScrollView {
-                  anchors.fill: parent
-                  clip: true
-                  contentWidth: availableWidth
+                  Layout.fillWidth: true
+                  Layout.fillHeight: true
 
                   ColumnLayout {
-                        width: settingsDialog.width - 40
+                        anchors.fill: parent
                         spacing: 8
 
                         RowLayout {
@@ -314,18 +285,108 @@ MuseScore {
                               }
                         }
 
-                        Label { text: checker.catTitle("A"); font.bold: true; Layout.topMargin: 4 }
-                        RuleGroup { ruleModel: modelA }
-                        Label { text: checker.catTitle("B"); font.bold: true }
-                        RuleGroup { ruleModel: modelB }
-                        Label { text: checker.catTitle("C"); font.bold: true }
-                        RuleGroup { ruleModel: modelC }
-                        Label { text: checker.catTitle("D"); font.bold: true }
-                        RuleGroup { ruleModel: modelD }
-                        Label { text: checker.catTitle("E"); font.bold: true }
-                        RuleGroup { ruleModel: modelE }
-                        Label { text: checker.catTitle("F"); font.bold: true }
-                        RuleGroup { ruleModel: modelF }
+                        GroupBox {
+                              title: checker.catTitle("A")
+                              Layout.fillWidth: true
+                              ColumnLayout {
+                                    Repeater {
+                                          model: modelA
+                                          delegate: CheckBox {
+                                                text: checker.lang === "en" ? nameEn : nameEs
+                                                checked: enabled
+                                                onToggled: modelA.setProperty(index, "enabled", checked)
+                                                ToolTip.visible: hovered
+                                                ToolTip.delay: 300
+                                                ToolTip.text: cite
+                                          }
+                                    }
+                              }
+                        }
+                        GroupBox {
+                              title: checker.catTitle("B")
+                              Layout.fillWidth: true
+                              ColumnLayout {
+                                    Repeater {
+                                          model: modelB
+                                          delegate: CheckBox {
+                                                text: checker.lang === "en" ? nameEn : nameEs
+                                                checked: enabled
+                                                onToggled: modelB.setProperty(index, "enabled", checked)
+                                                ToolTip.visible: hovered
+                                                ToolTip.delay: 300
+                                                ToolTip.text: cite
+                                          }
+                                    }
+                              }
+                        }
+                        GroupBox {
+                              title: checker.catTitle("C")
+                              Layout.fillWidth: true
+                              ColumnLayout {
+                                    Repeater {
+                                          model: modelC
+                                          delegate: CheckBox {
+                                                text: checker.lang === "en" ? nameEn : nameEs
+                                                checked: enabled
+                                                onToggled: modelC.setProperty(index, "enabled", checked)
+                                                ToolTip.visible: hovered
+                                                ToolTip.delay: 300
+                                                ToolTip.text: cite
+                                          }
+                                    }
+                              }
+                        }
+                        GroupBox {
+                              title: checker.catTitle("D")
+                              Layout.fillWidth: true
+                              ColumnLayout {
+                                    Repeater {
+                                          model: modelD
+                                          delegate: CheckBox {
+                                                text: checker.lang === "en" ? nameEn : nameEs
+                                                checked: enabled
+                                                onToggled: modelD.setProperty(index, "enabled", checked)
+                                                ToolTip.visible: hovered
+                                                ToolTip.delay: 300
+                                                ToolTip.text: cite
+                                          }
+                                    }
+                              }
+                        }
+                        GroupBox {
+                              title: checker.catTitle("E")
+                              Layout.fillWidth: true
+                              ColumnLayout {
+                                    Repeater {
+                                          model: modelE
+                                          delegate: CheckBox {
+                                                text: checker.lang === "en" ? nameEn : nameEs
+                                                checked: enabled
+                                                onToggled: modelE.setProperty(index, "enabled", checked)
+                                                ToolTip.visible: hovered
+                                                ToolTip.delay: 300
+                                                ToolTip.text: cite
+                                          }
+                                    }
+                              }
+                        }
+                        GroupBox {
+                              title: checker.catTitle("F")
+                              Layout.fillWidth: true
+                              ColumnLayout {
+                                    Repeater {
+                                          model: modelF
+                                          delegate: CheckBox {
+                                                text: checker.lang === "en" ? nameEn : nameEs
+                                                checked: enabled
+                                                onToggled: modelF.setProperty(index, "enabled", checked)
+                                                ToolTip.visible: hovered
+                                                ToolTip.delay: 300
+                                                ToolTip.text: cite
+                                          }
+                                    }
+                              }
+                        }
 
                         GroupBox {
                               title: checker.S("marking")
@@ -502,11 +563,11 @@ MuseScore {
                         var a = s[i - 1], b = s[i];
                         if (a.pitch === b.pitch) continue;
                         if (isEnabled("augmentedSecond") && Logic.isAugmentedSecond(a, b))
-                              report("augmentedSecond", [a, b], tr("aug 2nd", "2ª aum."));
+                              report("augmentedSecond", [a, b], loc("aug 2nd", "2ª aum."));
                         else if (isEnabled("augDimLeaps") && Logic.isAugOrDimLeap(a, b))
-                              report("augDimLeaps", [a, b], tr("aug/dim leap", "salto aum./dism."));
+                              report("augDimLeaps", [a, b], loc("aug/dim leap", "salto aum./dism."));
                         if (isEnabled("largeLeaps") && Logic.semitones(a, b) > 12)
-                              report("largeLeaps", [a, b], tr("leap > 8ve", "salto > 8ª"));
+                              report("largeLeaps", [a, b], loc("leap > 8ve", "salto > 8ª"));
                   }
             }
       }
@@ -534,17 +595,17 @@ MuseScore {
                               if (!m) continue;
                               if (m.type === "parallel") {
                                     if (m.interval === "5" && isEnabled("parallelFifths"))
-                                          report("parallelFifths", [uPrev, lPrev, uCur, lCur], tr("parallel 5th", "5ª paralela"));
+                                          report("parallelFifths", [uPrev, lPrev, uCur, lCur], loc("parallel 5th", "5ª paralela"));
                                     else if (m.interval === "8" && isEnabled("parallelOctaves"))
-                                          report("parallelOctaves", [uPrev, lPrev, uCur, lCur], tr("parallel 8ve", "8ª paralela"));
+                                          report("parallelOctaves", [uPrev, lPrev, uCur, lCur], loc("parallel 8ve", "8ª paralela"));
                                     else if (m.interval === "1" && isEnabled("parallelUnisons"))
-                                          report("parallelUnisons", [uPrev, lPrev, uCur, lCur], tr("parallel unison", "unísono paralelo"));
+                                          report("parallelUnisons", [uPrev, lPrev, uCur, lCur], loc("parallel unison", "unísono paralelo"));
                               } else if (m.type === "hidden" && isEnabled("hiddenFifthsOctaves")) {
                                     report("hiddenFifthsOctaves", [uPrev, lPrev, uCur, lCur],
-                                           tr("hidden " + m.interval, "oculta " + m.interval));
+                                           loc("hidden " + m.interval, "oculta " + m.interval));
                               } else if (m.type === "contrary-equal" && isEnabled("fifthsContraryMotion")) {
                                     report("fifthsContraryMotion", [uPrev, lPrev, uCur, lCur],
-                                           tr("contrary " + m.interval, "mov. contrario " + m.interval));
+                                           loc("contrary " + m.interval, "mov. contrario " + m.interval));
                               }
                         }
                   }
@@ -570,15 +631,15 @@ MuseScore {
                         for (var j = 0; j < rr.length; j++) {
                               var w = byRole[rr[j]];
                               if (w && Logic.outOfRange(w.pitch, rr[j]))
-                                    report("voiceRange", [w], tr("range " + rr[j], "ámbito " + rr[j]));
+                                    report("voiceRange", [w], loc("range " + rr[j], "ámbito " + rr[j]));
                         }
                   }
                   // spacing > octave between adjacent upper voices
                   if (isEnabled("spacingOverOctave")) {
                         if (byRole["S"] && byRole["A"] && (byRole["S"].pitch - byRole["A"].pitch) > 12)
-                              report("spacingOverOctave", [byRole["S"], byRole["A"]], tr("> 8ve (S-A)", "> 8ª (S-A)"));
+                              report("spacingOverOctave", [byRole["S"], byRole["A"]], loc("> 8ve (S-A)", "> 8ª (S-A)"));
                         if (byRole["A"] && byRole["T"] && (byRole["A"].pitch - byRole["T"].pitch) > 12)
-                              report("spacingOverOctave", [byRole["A"], byRole["T"]], tr("> 8ve (A-T)", "> 8ª (A-T)"));
+                              report("spacingOverOctave", [byRole["A"], byRole["T"]], loc("> 8ve (A-T)", "> 8ª (A-T)"));
                   }
                   // voice crossing (adjacent)
                   if (isEnabled("voiceCrossing")) {
@@ -586,7 +647,7 @@ MuseScore {
                         for (var c = 0; c < ord.length - 1; c++) {
                               var hi = byRole[ord[c]], lo = byRole[ord[c + 1]];
                               if (hi && lo && hi.pitch < lo.pitch)
-                                    report("voiceCrossing", [hi, lo], tr("crossing ", "cruce ") + ord[c] + "/" + ord[c + 1]);
+                                    report("voiceCrossing", [hi, lo], loc("crossing ", "cruce ") + ord[c] + "/" + ord[c + 1]);
                         }
                   }
                   // overlap vs the previous verticality
@@ -595,9 +656,9 @@ MuseScore {
                         for (var pp = 0; pp < pairs.length; pp++) {
                               var up = pairs[pp][0], dn = pairs[pp][1];
                               if (byRole[up] && prevByRole[dn] && byRole[up].pitch < prevByRole[dn].pitch)
-                                    report("voiceOverlap", [byRole[up]], tr("overlap ", "superposición ") + up + "/" + dn);
+                                    report("voiceOverlap", [byRole[up]], loc("overlap ", "superposición ") + up + "/" + dn);
                               else if (byRole[dn] && prevByRole[up] && byRole[dn].pitch > prevByRole[up].pitch)
-                                    report("voiceOverlap", [byRole[dn]], tr("overlap ", "superposición ") + up + "/" + dn);
+                                    report("voiceOverlap", [byRole[dn]], loc("overlap ", "superposición ") + up + "/" + dn);
                         }
                   }
                   prevByRole = byRole;
@@ -645,7 +706,7 @@ MuseScore {
                         (degreeRoot === "I" || degreeRoot === "IV" || degreeRoot === "V") &&
                         counts["third"] && counts["third"].length >= 2) {
                         report("doubledThird", counts["third"],
-                               tr("doubled 3rd (", "3ª duplicada (") + degreeRoot + ")");
+                               loc("doubled 3rd (", "3ª duplicada (") + degreeRoot + ")");
                   }
 
                   if (isEnabled("doubledLeadingTone")) {
@@ -653,24 +714,24 @@ MuseScore {
                         for (var e = 0; e < son.length; e++)
                               if (Logic.tpc2pc(son[e].w.tpc) === leadingPc) lead.push(son[e].w);
                         if (lead.length >= 2) report("doubledLeadingTone", lead,
-                               tr("doubled leading tone", "sensible duplicada"));
+                               loc("doubled leading tone", "sensible duplicada"));
                   }
 
                   if (isEnabled("doubledSeventh") && chord.seventhPc !== null &&
                         counts["seventh"] && counts["seventh"].length >= 2) {
-                        report("doubledSeventh", counts["seventh"], tr("doubled 7th", "7ª duplicada"));
+                        report("doubledSeventh", counts["seventh"], loc("doubled 7th", "7ª duplicada"));
                   }
 
                   if (isEnabled("rootNotDoubled") && chord.inversion === 0 &&
                         chord.seventhPc === null &&
                         (!counts["root"] || counts["root"].length < 2)) {
                         report("rootNotDoubled", counts["root"] || [son[0].w],
-                               tr("root not doubled", "fundamental sin duplicar"));
+                               loc("root not doubled", "fundamental sin duplicar"));
                   }
 
                   if (isEnabled("incompleteChord") &&
                         (!counts["third"] || counts["third"].length === 0)) {
-                        report("incompleteChord", [son[0].w], tr("missing 3rd", "acorde sin 3ª"));
+                        report("incompleteChord", [son[0].w], loc("missing 3rd", "acorde sin 3ª"));
                   }
 
                   // --- Resolutions (need the next note in the voice) ---
@@ -689,7 +750,7 @@ MuseScore {
                                     (nextNote.pitch - item.w.pitch === 1 || nextNote.pitch - item.w.pitch === 2);
                               if (!risesToTonic)
                                     report("leadingToneResolution", [item.w],
-                                           tr("leading tone unresolved", "sensible sin resolver"));
+                                           loc("leading tone unresolved", "sensible sin resolver"));
                         }
 
                         // Seventh resolution (any voice)
@@ -700,7 +761,7 @@ MuseScore {
                                               Logic.intervalNumber(item.w, nextNote) === 2;
                               if (!stepsDown)
                                     report("seventhResolution", [item.w],
-                                           tr("7th unresolved", "7ª sin resolver"));
+                                           loc("7th unresolved", "7ª sin resolver"));
                         }
 
                         // Preparation of NON-dominant sevenths
@@ -712,7 +773,7 @@ MuseScore {
                                      Logic.tpc2pc(prevNote.tpc) === chord.seventhPc);
                               if (!prepared)
                                     report("seventhPreparation", [item.w],
-                                           tr("7th unprepared", "7ª sin preparar"));
+                                           loc("7th unprepared", "7ª sin preparar"));
                         }
                   }
             }
@@ -752,7 +813,7 @@ MuseScore {
             for (var i = 0; i < RULES.length; i++) {
                   var id = RULES[i].id;
                   var c = findingCounts[id] || 0;
-                  if (c > 0) { total += c; lines.push("• " + tr(RULES[i].en, RULES[i].es) + ": " + c); }
+                  if (c > 0) { total += c; lines.push("• " + loc(RULES[i].en, RULES[i].es) + ": " + c); }
             }
             if (total === 0) {
                   msgResult.text = S("noFindings");
